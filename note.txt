@@ -1,0 +1,31 @@
+# source:
+    https://chat.deepseek.com/a/chat/s/de045f09-b36b-445d-9a00-e67936af2647
+
+# add the following to App\Providers\AppServiceProvider.php
+    use Illuminate\Support\Facades\Schema;
+
+    public function boot()
+    {
+        Schema::defaultStringLength(191);
+    }
+
+# Enable CORS (for separate frontend)
+    Add to config/cors.php:
+        'paths' => ['api/*', 'sanctum/csrf-cookie'],
+        'allowed_methods' => ['*'],
+        'allowed_origins' => ['http://localhost:5173'], // Your React dev server
+        'allowed_origins_patterns' => [],
+        'allowed_headers' => ['*'],
+        'exposed_headers' => [],
+        'max_age' => 0,
+        'supports_credentials' => true,
+
+
+# Run backend:
+    php artisan server
+# Run frontend
+    npm run dev
+
+## Frontend: React with Vite
+    1. Create React App (in a separate folder)
+    2. Configure API Base URL
