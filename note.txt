@@ -20,9 +20,18 @@
         'max_age' => 0,
         'supports_credentials' => true,
 
+# backend:
+    - cd backend
+    - composer install
+    - php artisan key:generate
+    - Run Migration:
+        php artisan migrate
+
+# frontend
+    - npm install
 
 # Run backend:
-    php artisan server
+    php artisan serve
 # Run frontend
     npm run dev
 
