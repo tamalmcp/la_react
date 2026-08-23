@@ -16,14 +16,18 @@ function App() {
     price: '',
     stock: ''
   });
+  const [loading, setLoading] = useState(true);
 
   const fetchProducts = async () => {
+    setLoading(true);
     try {
       const response = await axios.get('/products');
       setProducts(response.data);
+      setLoading(false);
     } catch (error) {
       console.error('Error fetching products:', error);
       alert('Failed to fetch products');
+      setLoading(false);
     }
   }
 // console.log('API Base URL:', axios.defaults.baseURL);
@@ -42,7 +46,16 @@ function App() {
         {/* Products List */}
         <div className="products-list">
           <h2>Products ({products.length})</h2>
-          {products.length === 3 ? (
+          {/* ========== loading ========== */}
+          {/* {loading ? (
+            <p>Loading products...</p>
+          ) : products.length === 0 ? (
+            <p className='no-products'>No products found. Add your first product!</p>
+          ) : (
+            <p>Has Products</p>
+          )} */}
+          {/* ========== /loading ========== */}
+          {products.length === 0 ? (
             <p className='no-products'>No products found. Add your first product!</p>
           ) : (
             <p>AAA</p>
