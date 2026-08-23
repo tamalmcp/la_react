@@ -58,7 +58,24 @@ function App() {
           {products.length === 0 ? (
             <p className='no-products'>No products found. Add your first product!</p>
           ) : (
-            <p>AAA</p>
+            <div className="product-grid">
+              {products.map((product) => (
+                <div key={product.id} className="product-card">
+                  <div className="product-info">
+                    <h3>{product.name}</h3>
+                    <p className='description'>{product.description || 'No description'}</p>
+                    <div className="product-details">
+                      <span className="price">${product.price}</span>
+                      <span className="stock">Stock: {product.stock}</span>
+                    </div>
+                  </div>
+                  <div className="product-actions">
+                    <button className="btn-edit" onClick={() => handleEdit(product)}>Edit</button>
+                    <button className="btn-delete" onClick={() => handleDelete(product.id)}>Delete</button>
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </div>
       </div>
