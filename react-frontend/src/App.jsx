@@ -16,18 +16,18 @@ function App() {
     price: '',
     stock: ''
   });
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
 
   const fetchProducts = async () => {
-    setLoading(true);
+    // setLoading(true);
     try {
       const response = await axios.get('/products');
       setProducts(response.data);
-      setLoading(false);
+      // setLoading(false);
     } catch (error) {
       console.error('Error fetching products:', error);
       alert('Failed to fetch products');
-      setLoading(false);
+      // setLoading(false);
     }
   }
 // console.log('API Base URL:', axios.defaults.baseURL);
