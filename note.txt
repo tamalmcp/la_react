@@ -9,16 +9,33 @@
         Schema::defaultStringLength(191);
     }
 
-# Enable CORS (for separate frontend)
-    Add to config/cors.php:
-        'paths' => ['api/*', 'sanctum/csrf-cookie'],
-        'allowed_methods' => ['*'],
-        'allowed_origins' => ['http://localhost:5173'], // Your React dev server
-        'allowed_origins_patterns' => [],
-        'allowed_headers' => ['*'],
-        'exposed_headers' => [],
-        'max_age' => 0,
-        'supports_credentials' => true,
+## backend:
+    - Enable CORS (for separate frontend)
+        - Add to config/cors.php:
+            'paths' => ['api/*', 'sanctum/csrf-cookie'],
+            'allowed_methods' => ['*'],
+            'allowed_origins' => ['http://localhost:5173'], // Your React dev server
+            'allowed_origins_patterns' => [],
+            'allowed_headers' => ['*'],
+            'exposed_headers' => [],
+            'max_age' => 0,
+            'supports_credentials' => true,
+
+## frontend:
+    - Configure API Base URL
+        - Create: src/api/axiosConfig.js
+        
+            import axios from 'axios';
+
+            const axiosInstance = axios.create({
+                baseURL: 'http://localhost:8000/api',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            });
+
+            export default axiosInstance;
 
 # backend:
     - cd backend
@@ -38,3 +55,7 @@
 ## Frontend: React with Vite
     1. Create React App (in a separate folder)
     2. Configure API Base URL
+
+
+
+

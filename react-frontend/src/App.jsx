@@ -41,7 +41,12 @@ function App() {
         <h1>Product Management</h1>
         {/* Products List */}
         <div className="products-list">
-          {console.log(products.length)}
+          <h2>Products ({products.length})</h2>
+          {products.length === 3 ? (
+            <p className='no-products'>No products found. Add your first product!</p>
+          ) : (
+            <p>AAA</p>
+          )}
         </div>
       </div>
     </div>
