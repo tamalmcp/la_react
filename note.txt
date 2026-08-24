@@ -57,5 +57,26 @@
     2. Configure API Base URL
 
 
+# backend:
+    - issue:
+        -- laravel validation error
+            --- message	"Method Illuminate\\Http\\Request::validated does not exist."
+        -- solution:
+            --- Replace $request->validated() with $request->validate()
+
+                public function store(Request $request) {
+                    // Validate returns the validated data directly
+                    $validated = $request->validate([
+                        'name' => 'required|string|max:255',
+                        'price' => 'required|numeric',
+                        'stock' => 'required|integer',
+                        'description' => 'nullable|string'
+                    ]);
+                    
+                    $product = Product::create($validated);
+                    return response()->json($product, 201);
+                }
+
+
 
 

@@ -18,6 +18,7 @@ function App() {
   });
   // const [loading, setLoading] = useState(true);
 
+    // Fetch all products
   const fetchProducts = async () => {
     // setLoading(true);
     try {
@@ -39,10 +40,94 @@ function App() {
     fetchProducts();
   }, []);
 
+  // Handle form input changes
+  const handleInputChange = (e) => {
+    const {name, value} = e.target;
+    setFormData({
+      ...formData,
+      [name]: value
+    });
+  };
+
+  // Handle form submit for create/update
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // console.log('Submitting formData:', formData);
+    
+    try {
+      if (editingProduct) {
+        // Update product
+        console.log('Updating product with ID:', editingProduct.id);
+      } else {
+        // Create product
+        await axios.post('/products', formData);
+        alert('Product created successfully!');
+      }
+
+      // Reset form and refresh list
+      fetchProducts();
+      resetForm();
+    } catch (error) {
+      console.error('Error saving product:', error);
+      alert('Failed to save product');
+    }
+  }
+
+  const handleEdit = (product) => {
+    console.log('Editing product:', product);
+  };
+
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      description: '',
+      price: '',
+      stock: ''
+    });
+    setEditingProduct(null);
+    setShowForm(false);
+  };
+
   return (
     <div className="App">
       <div className="container">
         <h1>Product Management</h1>
+
+        {/* Add New Product Button */}
+        {!showForm && (
+          <button className="btn-add" onClick={() => setShowForm(true)}>+ Add New Product</button>
+        )}
+
+        {/* Product Form */}
+        {showForm && (
+          <div className="form-container">
+            <h2>{editingProduct ? 'Edit Product' : 'Add New Product'}</h2>
+            <form onSubmit={handleSubmit}>
+              <div className="form-group">
+                <label>Name *</label>
+                <input type="text" name="name" value={formData.name} onChange={handleInputChange} required />
+              </div>
+              <div className="form-group">
+                <label>Description</label>
+                <textarea name="description" value={formData.description} onChange={handleInputChange} rows="3"></textarea>
+              </div>
+              <div className="form-group">
+                <label>Price *</label>
+                <input type="number" name="price" value={formData.price} onChange={handleInputChange} step="0.01" required />
+              </div>
+              <div className="form-group">
+                <label>Stock *</label>
+                <input type="number" name="stock" value={formData.stock} onChange={handleInputChange} required />
+              </div>
+              <div className="form-actions">
+                <button type="submit" className="btn-save">{editingProduct ? 'Update' : 'Create'}</button>
+                <button type="button" className="btn-cancel" onClick={resetForm}>Cancel</button>
+              </div>
+            </form>
+          </div>
+        )}
+
         {/* Products List */}
         <div className="products-list">
           <h2>Products ({products.length})</h2>
@@ -80,7 +165,7 @@ function App() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
