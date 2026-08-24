@@ -58,7 +58,8 @@ function App() {
     try {
       if (editingProduct) {
         // Update product
-        console.log('Updating product with ID:', editingProduct.id);
+        await axios.put(`/products/${editingProduct.id}`, formData);
+        alert('Product updated successfully!');
       } else {
         // Create product
         await axios.post('/products', formData);
@@ -75,7 +76,15 @@ function App() {
   }
 
   const handleEdit = (product) => {
-    console.log('Editing product:', product);
+    setEditingProduct(product);
+    setFormData({
+      name: product.name,
+      description: product.description || '',
+      price: product.price,
+      stock: product.stock
+    });
+    setShowForm(true);
+    // console.log('Editing product:', product);
   };
 
   const resetForm = () => {
