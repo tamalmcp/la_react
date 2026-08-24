@@ -78,5 +78,21 @@
                 }
 
 
+## Login:
+    - Backend:
+        - Laravel Authentication API
+            - 1. Install Sanctum for API Authentication
+            - 2. Configure Sanctum
+            - 3. Create User Model (Already exists)
+            - 4. Create Auth Controller
+            - 5. Update Routes
+            - 6. Update Product Controller for Authentication
+    - Frontend: 
+        - React Authentication
+            - 1. Install Required Packages
+                - npm install axios react-router-dom
+            - 2. Create Auth Context for State Management
+                - src/context/AuthContext.jsx
+
 
 
