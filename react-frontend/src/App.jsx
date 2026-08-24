@@ -87,6 +87,19 @@ function App() {
     // console.log('Editing product:', product);
   };
 
+  const handleDelete = async (productId) => {
+    if (window.confirm('Are you sure you want to delete this product?')) {
+      try {
+        await axios.delete(`/products/${productId}`);
+        alert('Product deleted successfully!');
+        fetchProducts();
+      } catch (error) {
+        console.error('Error deleting product:', error);
+        alert('Failed to delete product');
+      }
+    }
+  }
+
   const resetForm = () => {
     setFormData({
       name: '',
