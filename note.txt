@@ -78,7 +78,7 @@
                 }
 
 
-## Login:
+## Login:   [ JWT-based authentication system ]
     - Backend:
         - Laravel Authentication API
             - 1. Install Sanctum for API Authentication
@@ -93,6 +93,22 @@
                 - npm install axios react-router-dom
             - 2. Create Auth Context for State Management
                 - src/context/AuthContext.jsx
+            - 3. Update Axios Configuration
+                - src/api/axiosConfig.js
+            - 4. Create Login Component
+                - src/components/Login.jsx
+            - 5. Create Register Component
+                - src/components/Register.jsx
+            - 6. Create Protected Route Component
+                - src/components/PrivateRoute.jsx
+            - 7. Update Product Component with Logout
+                - src/App.jsx (Updated with authentication)
+            - 8. Update Main App with Routing
+                - src/App.jsx (Replace with routing version)
+            - 9. Create Separate Products Component
+                - src/components/Products.jsx (Move product logic here)
+            - 10. Update CSS with Auth Styles
+                - src/App.css (Add these styles)
 
 
 
