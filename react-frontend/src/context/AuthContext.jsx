@@ -1,5 +1,5 @@
-import React { createContext, useState, useContext, useEffect } from "react";
-import axios from "axios";
+import React, { createContext, useState, useContext, useEffect } from "react";
+import axios from "../api/axiosConfig";
 
 const AuthContext = createContext();
 
@@ -63,7 +63,7 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const register = async () => {
+    const register = async (name, email, password, password_confirmation) => {
         try {
             const response = await axios.post('/register', {
                 name,

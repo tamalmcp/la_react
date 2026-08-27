@@ -21,6 +21,11 @@
             'max_age' => 0,
             'supports_credentials' => true,
 
+## backend: 
+    - to check laravel version, run the following command
+        - php artisan --version
+    - laravel version is 8.83.29
+
 ## frontend:
     - Configure API Base URL
         - Create: src/api/axiosConfig.js
