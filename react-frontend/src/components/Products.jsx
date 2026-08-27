@@ -10,7 +10,7 @@ import axios from "../api/axiosConfig";
 function App() {
   // const [count, setCount] = useState(0)
   const { user, logout } = useAuth();
-  const navigat = useNavigate();
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
