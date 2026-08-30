@@ -19,7 +19,15 @@ const UserList = () => {
     const [success, setSuccess] = useState('');
 
     const fetchUsers = async () => {
-        //
+        try {
+            const response = await axios.get('/users');
+            setUsers(response.data);
+        } catch (error) {
+            console.error('Error fetching users:', error);
+            setError('Failed to load users');
+        } finally {
+            setLoading(false);
+        }
     }
 
     useEffect(() => {

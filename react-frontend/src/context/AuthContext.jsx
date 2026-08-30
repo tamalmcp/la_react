@@ -100,6 +100,10 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const isAdmin = () => {
+        return user?.role === 'admin';
+    };
+
     const value = {
         user,
         login,
