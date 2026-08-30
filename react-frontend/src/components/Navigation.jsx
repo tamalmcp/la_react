@@ -30,6 +30,11 @@ const Navigation = () => {
                             Users
                         </Link>
                     )}
+                    <Link 
+                    to="/categories" 
+                    className={location.pathname === '/categories' ? 'active' : ''}>
+                        Category
+                    </Link>
                 </div>
                 <div className="nav-user">
                     <span>{user.name}</span>

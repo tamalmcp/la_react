@@ -7,6 +7,7 @@ import Register from './components/Register';
 import Products from './components/Products';
 import UserList from './components/UserList';
 import Navigation from './components/Navigation';
+import Categories from './components/Categories';
 import './App.css'
 // import App from './App - Products';
 
@@ -32,6 +33,14 @@ const AppContent = () => {
           element={
             <PrivateRoute>
               <UserList  />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path='/categories'
+          element={
+            <PrivateRoute>
+              <Categories/>
             </PrivateRoute>
           }
         />
