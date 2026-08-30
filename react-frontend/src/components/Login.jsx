@@ -15,8 +15,16 @@ const Login = () => {
         setError('');
         setLoading(true);
 
-        const result = await login(email, password)
-        console.log(result);
+        const result = await login(email, password);
+
+        setLoading(false);
+        if (result.success) {
+            navigate('/products');
+        } else {
+            setError(result.message);
+        }
+
+        // console.log(result);
     };
 
     return (
