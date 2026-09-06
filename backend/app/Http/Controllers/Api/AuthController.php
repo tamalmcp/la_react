@@ -24,8 +24,10 @@ class AuthController extends Controller
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'role' => 'user',
+            // 'role' => 'user',
         ]);
+
+        $user->assignRole('user'); // Assign the default 'user' role
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -70,6 +72,14 @@ class AuthController extends Controller
 
     public function user(Request $request): JsonResponse
     {
-        return response()->json($request->user());
+        $user = $request->user();
+        // Load the permissions directly from the user's roles
+        $permissions = $user->getAllPermissions()->pluck('name');
+
+        return response()->json([
+            'user' => $user,
+            'permissions' => $permissions, // Send permissions to frontend
+        ]);
+        // return response()->json($request->user());
     }
 }

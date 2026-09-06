@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
@@ -41,15 +42,23 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
-            'role' => 'sometimes|in:admin,user'
+            // 'role' => 'sometimes|in:admin,user',
+            'role' => 'sometimes|exists:roles,name', // Validate against the roles table
         ]);
 
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'role' => $validated['role'] ?? 'user'
+            // 'role' => $validated['role'] ?? 'user'
         ]);
+
+                // Assign the role if provided, otherwise assign the 'user' role
+                if (isset($validated['role'])) {
+                    $user->assignRole($validated['role']);
+                } else {
+                    $user->assignRole('user');
+                }
 
         return response()->json([
             'user' => $user,
@@ -69,17 +78,27 @@ class UserController extends Controller
             'name' => 'sometimes|string|max:255',
             'email' => 'sometimes|string|email|max:255|unique:users,email,' . $id,
             'password' => 'sometimes|string|min:8',
-            'role' => 'sometimes|in:admin,user'
+            // 'role' => 'sometimes|in:admin,user',
+                    'role' => 'sometimes|exists:roles,name', // match store()'s validation
         ]);
 
         if (isset($validated['password'])) {
             $validated['password'] = Hash::make($validated['password']);
         }
+        
+        // Pull role out so it's not passed to $user->update() as a plain column
+        $role = $validated['role'] ?? null;
+        unset($validated['role']);
 
         $user->update($validated);
+        
+        if ($role) {
+            $user->syncRoles($role);
+        }
 
         return response()->json([
-            'user' => $user,
+            // 'user' => $user,
+            'user' => $user->fresh()->load('roles'), // fresh() + load('roles') so response reflects the new role
             'message' => 'User updated successfully'
         ]);
     }
@@ -115,13 +134,16 @@ class UserController extends Controller
         }
 
         $validated = $request->validate([
-            'role' => 'required|in:admin,user'
+            // 'role' => 'required|in:admin,user'
+            'role' => 'required|exists:roles,name',  // match store()'s validation style
         ]);
 
-        $user->update(['role' => $validated['role']]);
+        // $user->update(['role' => $validated['role']]);
+        $user->syncRoles($validated['role']);
 
         return response()->json([
-            'user' => $user,
+            // 'user' => $user,
+            'user' => $user->fresh()->load('roles'),
             'message' => 'User role updated successfully'
         ]);
     }

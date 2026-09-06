@@ -15,6 +15,7 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [token, setToken] = useState(localStorage.getItem('token'));
+    const [permissions, setPermissions] = useState([]);
 
     // Set up axios intercepter for token
     useEffect(() => {
@@ -31,7 +32,10 @@ export const AuthProvider = ({ children }) => {
             if (token) {
                 try {
                     const response = await axios.get('/user');
-                    setUser(response.data);
+                    // setUser(response.data);
+                    setUser(response.data.user);
+                    // Store permissions in state or localStorage
+                    setPermissions(response.data.permissions);
                 } catch (error) {
                     console.error('Auth check failed:', error);
                     localStorage.removeItem('token');

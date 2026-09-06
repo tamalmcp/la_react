@@ -115,5 +115,19 @@
             - 10. Update CSS with Auth Styles
                 - src/App.css (Add these styles)
 
-
+# Role-based permissions using Spatie (Laravel-Permission package): 
+    - Backend:
+        - Step 1: Install and Configure the Package
+            composer require spatie/laravel-permission
+            php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider" --tag="permission-migrations"
+            php artisan migrate
+        - Step 2: Set Up User Model and Middleware
+            - 1. Attach the HasRoles Trait to Your User Model
+            - 2. Register the Middleware
+        - Step 3: Seed Your Roles and Permissions
+        - Step 4: Protect Your API Routes
+        - Step 5: Update Your UserController
+        - Step 6: Update Your Authentication Controller
+        - Step 7: Frontend Integration (React)
+    - Frontend:
 
