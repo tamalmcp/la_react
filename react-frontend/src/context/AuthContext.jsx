@@ -108,13 +108,26 @@ export const AuthProvider = ({ children }) => {
         return user?.role === 'admin';
     };
 
+    // Check if the user has a single permission
+    const hasPermission = (permission) => {
+        return permissions.includes(permission);
+    };
+
+    // Check if the user has at least one of the given permissions
+    const hasAnyPermission = (permissionList = []) => {
+        return permissionList.some((permission) => permissions.includes(permission));
+    };
+
     const value = {
         user,
         login,
         register,
         logout,
         loading,
-        isAuthenticated: !!user
+        isAuthenticated: !!user,
+        permissions,
+        hasPermission,
+        hasAnyPermission
     };
 
     return (

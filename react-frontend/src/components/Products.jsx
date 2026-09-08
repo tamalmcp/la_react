@@ -9,7 +9,7 @@ import axios from "../api/axiosConfig";
 
 function App() {
   // const [count, setCount] = useState(0)
-  const { user, logout } = useAuth();
+  const { user, logout, hasPermission } = useAuth();
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [showForm, setShowForm] = useState(false);
@@ -61,6 +61,12 @@ function App() {
     e.preventDefault();
 
     // console.log('Submitting formData:', formData);
+
+    const requiredPermission = editingProduct ? 'edit products' : 'create products';
+    if (!hasPermission(requiredPermission)) {
+      alert('You do not have permission to perform this action.');
+      return;
+    }
     
     try {
       if (editingProduct) {
@@ -95,6 +101,10 @@ function App() {
   };
 
   const handleDelete = async (productId) => {
+    if (!hasPermission('delete products')) {
+      alert('You do not have permission to perform this action.');
+      return;
+    }
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
         await axios.delete(`/products/${productId}`);
@@ -136,12 +146,12 @@ function App() {
         </div>
 
         {/* Add New Product Button */}
-        {!showForm && (
+        {!showForm && hasPermission('create products') && (
           <button className="btn-add" onClick={() => setShowForm(true)}>+ Add New Product</button>
         )}
 
         {/* Product Form */}
-        {showForm && (
+        {showForm && (editingProduct ? hasPermission('edit products') : hasPermission('create products')) && (
           <div className="form-container">
             <h2>{editingProduct ? 'Edit Product' : 'Add New Product'}</h2>
             <form onSubmit={handleSubmit}>
@@ -181,7 +191,9 @@ function App() {
             <p>Has Products</p>
           )} */}
           {/* ========== /loading ========== */}
-          {products.length === 0 ? (
+          {!hasPermission('view products') ? (
+            <p className='no-products'>You do not have permission to view products.</p>
+          ) : products.length === 0 ? (
             <p className='no-products'>No products found. Add your first product!</p>
           ) : (
             <div className="product-grid">
@@ -195,10 +207,16 @@ function App() {
                       <span className="stock">Stock: {product.stock}</span>
                     </div>
                   </div>
-                  <div className="product-actions">
-                    <button className="btn-edit" onClick={() => handleEdit(product)}>Edit</button>
-                    <button className="btn-delete" onClick={() => handleDelete(product.id)}>Delete</button>
-                  </div>
+                  {(hasPermission('edit products') || hasPermission('delete products')) && (
+                    <div className="product-actions">
+                      {hasPermission('edit products') && (
+                        <button className="btn-edit" onClick={() => handleEdit(product)}>Edit</button>
+                      )}
+                      {hasPermission('delete products') && (
+                        <button className="btn-delete" onClick={() => handleDelete(product.id)}>Delete</button>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
