@@ -1,37 +1,115 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
+import axios from '../api/axiosConfig';
 import './UserList.css';
 
 function App() {
+    const { user, hasPermission } = useAuth();
+    const [categories, setCategories] = useState([]);
     const [showForm, setShowForm] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [editingCategory, setEditingCategory] = useState(null);
     const [formData, setFormData] = useState({
         name: '',
     });
+    const [loading, setLoading] = useState(false);
+
+    const fetchCategories = async () => {
+        setLoading(true);
+        try {
+            const response = await axios.get('/categories');
+            setCategories(response.data);
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+            setError('Failed to fetch categories');
+        } finally {
+            setLoading(false);
+        }
+    }
 
     useEffect(() => {
-        setSuccess('');
-        setError('');
+        fetchCategories();
     }, []);
 
-    const handleSubmit = (e) => {
+    useEffect(() => {
+        if (success || error) {
+            const timer = setTimeout(() => {
+                setSuccess('');
+                setError('');
+            }, 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [success, error]);
+
+    const handleInputChange = (e) => {
+        const { name, value} = e.target;
+        setFormData({
+            ...formData,
+            [name]: value
+        });
+    }
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
         setSuccess('');
-        console.log('Form submitted');
+
+        try {
+            if (editingCategory) {
+                await axios.put(`/categories/${editingCategory.id}`, formData);
+                setSuccess('Category updated successfully!');
+            } else {
+                await axios.post('/categories', formData);
+                setSuccess('Category created successfully!');
+            }
+            resetForm();
+            fetchCategories();
+        } catch (error) {
+            console.error('Error creating category:', error);
+            setError('Failed to create category');
+        }
+    }
+
+    const handleEdit = (category) => {
+        setEditingCategory(category);
+        setFormData({
+            name: category.name,
+        });
+        setShowForm(true);
+    }
+
+    const handleDelete = async (categoryId) => {
+        if (window.confirm('Are you sure you want to delete this category?')) {
+            console.log('Deleting category with ID:', categoryId);
+            try {
+                await axios.delete(`/categories/${categoryId}`);
+                setSuccess('Category deleted successfully!');
+                fetchCategories();
+            } catch (error) {
+                console.error('Error deleting category:', error);
+                setError('Failed to delete category');
+            }
+        }
     }
 
     const resetForm = () => {
+        setFormData({
+            name: '',
+        });
+        setEditingCategory(null);
         setShowForm(false);
-        setError('');
-        setSuccess('');
+        // setError('');
+        // setSuccess('');
     }
 
     return (
         <div className="user-management">
             <div className="user-header">
                 <h2>Categories</h2>
+                {!showForm && (
                 <button className="btn-add-user" onClick={() =>setShowForm(true)}>Add Category</button>
+                )}
             </div>
 
             {error && <div className="error-message">{error}</div>}
@@ -43,10 +121,10 @@ function App() {
                     <form onSubmit={handleSubmit}>
                         <div className="form-group">
                             <label>Name *</label>
-                            <input type="text" placeholder="Enter category name" />
+                            <input type="text" name="name" value={formData.name} onChange={handleInputChange} />
                         </div>
                         <div className="form-actions">
-                            <button type="submit" className="btn-save-user">Create</button>
+                            <button type="submit" className="btn-save-user">{editingCategory ? 'Update' : 'Create'}</button>
                             <button type="button" className="btn-cancel" onClick={resetForm}>Cancel</button>
                         </div>
                     </form>
@@ -63,11 +141,28 @@ function App() {
                         </tr>
                     </thead>
                     <tbody>
+                        {loading ? (
                         <tr>
-                            <td>1</td>
-                            <td>Category 1</td>
-                            <td>Actn</td>
+                            <td colSpan="3">Loading categories...</td>
                         </tr>
+                        ) : (
+                            categories.length === 0 ? (
+                                <tr>
+                                    <td colSpan="3">No categories found.</td>
+                                </tr>
+                            ) : (
+                                categories.map((category, index) => (
+                                    <tr key={category.id}>
+                                        <td>{index + 1}</td>
+                                        <td>{category.name}</td>
+                                        <td className="action-buttons">
+                                            <button className="btn-edit-user" onClick={() => handleEdit(category)}>Edit</button>
+                                            <button className="btn-delete-user" onClick={() => handleDelete(category.id)}>Delete</button>
+                                        </td>
+                                    </tr>
+                                ))
+                            )
+                        )}
                     </tbody>
                 </table>
             </div>
