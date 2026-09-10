@@ -13,13 +13,20 @@ function App() {
     const [formData, setFormData] = useState({
         name: '',
     });
+    const [currentPage, setCurrentPage] = useState(1);
+    const [lastPage, setLastPage] = useState(1);
     const [loading, setLoading] = useState(false);
 
-    const fetchCategories = async () => {
+    const fetchCategories = async (page = 1) => {
         setLoading(true);
         try {
-            const response = await axios.get('/categories');
-            setCategories(response.data);
+            // const response = await axios.get('/categories');
+            // setCategories(response.data);
+            const response = await axios.get(`/categories?page=${page}`);
+            setCategories(response.data.data);
+            setCurrentPage(response.data.currentPage);
+            setLastPage(response.data.last_page);
+            // console.log(response.data.last_page);
         } catch (error) {
             console.error('Error fetching categories:', error);
             setError('Failed to fetch categories');
@@ -29,8 +36,8 @@ function App() {
     }
 
     useEffect(() => {
-        fetchCategories();
-    }, []);
+        fetchCategories(currentPage);
+    }, [currentPage]);
 
     useEffect(() => {
         if (success || error) {
@@ -165,6 +172,23 @@ function App() {
                         )}
                     </tbody>
                 </table>
+                <div className="pagination-controls">
+                    <button
+                        disabled={currentPage === 1}
+                        onClick={() => setCurrentPage((prev) => prev - 1)}
+                    >
+                        Previous
+                    </button>
+
+                    <span>Page {currentPage} of {lastPage}</span>
+                    
+                    <button
+                        disabled={currentPage === lastPage}
+                        onClick={() => setCurrentPage((prev) => prev + 1)}
+                    >
+                        Next
+                    </button>
+                </div>
             </div>
         </div>
     );

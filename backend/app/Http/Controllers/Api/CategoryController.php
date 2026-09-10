@@ -19,9 +19,11 @@ class CategoryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $categories = Category::orderBy('created_at', 'desc')->get();
+        $perPage = $request->query('per_page', 10);
+        $categories = Category::orderBy('created_at', 'desc')->paginate($perPage);
+        // $categories = Category::orderBy('created_at', 'desc')->get();
         return response()->json($categories);
     }
 
