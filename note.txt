@@ -163,5 +163,24 @@
             useEffect(() => {
                 fetchCategories(currentPage);
             }, [currentPage]);
+
+
+            <div className="pagination-controls">
+                    <button
+                        disabled={currentPage === 1}
+                        onClick={() => setCurrentPage((prev) => prev - 1)}
+                    >
+                        Previous
+                    </button>
+
+                    <span>Page {currentPage} of {lastPage}</span>
+                    
+                    <button
+                        disabled={currentPage === lastPage}
+                        onClick={() => setCurrentPage((prev) => prev + 1)}
+                    >
+                        Next
+                    </button>
+                </div>
         // /=======================================================
 

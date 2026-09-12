@@ -24,7 +24,7 @@ function App() {
             // setCategories(response.data);
             const response = await axios.get(`/categories?page=${page}`);
             setCategories(response.data.data);
-            setCurrentPage(response.data.currentPage);
+            setCurrentPage(response.data.current_page);
             setLastPage(response.data.last_page);
             // console.log(response.data.last_page);
         } catch (error) {
@@ -158,21 +158,44 @@ function App() {
                                     <td colSpan="3">No categories found.</td>
                                 </tr>
                             ) : (
-                                categories.map((category, index) => (
-                                    <tr key={category.id}>
-                                        <td>{index + 1}</td>
-                                        <td>{category.name}</td>
-                                        <td className="action-buttons">
-                                            <button className="btn-edit-user" onClick={() => handleEdit(category)}>Edit</button>
-                                            <button className="btn-delete-user" onClick={() => handleDelete(category.id)}>Delete</button>
-                                        </td>
-                                    </tr>
-                                ))
+                                // categories.map((category, index) => (
+                                //     <tr key={category.id}>
+                                //         <td>{index + 1}</td>
+                                //         <td>{category.name}</td>
+                                //         <td className="action-buttons">
+                                //             <button className="btn-edit-user" onClick={() => handleEdit(category)}>Edit</button>
+                                //             <button className="btn-delete-user" onClick={() => handleDelete(category.id)}>Delete</button>
+                                //         </td>
+                                //     </tr>
+                                // ))
+
+                                categories.map((category, index) => {
+                                    const perPage = 10; // must match what your backend paginates by
+                                    const serialNo = (currentPage - 1) * perPage + index + 1;
+
+                                    return (
+                                        <tr key={category.id}>
+                                            <td>{serialNo}</td>
+                                            <td>{category.name}</td>
+                                            <td className="action-buttons">
+                                                <button className="btn-edit-user" onClick={() => handleEdit(category)}>Edit</button>
+                                                <button className="btn-delete-user" onClick={() => handleDelete(category.id)}>Delete</button>
+                                            </td>
+                                        </tr>
+                                    );
+                                })
                             )
                         )}
                     </tbody>
                 </table>
                 <div className="pagination-controls">
+                    <button
+                        disabled={currentPage === 1}
+                        onClick={() => setCurrentPage(1)}
+                    >
+                        First
+                    </button>
+
                     <button
                         disabled={currentPage === 1}
                         onClick={() => setCurrentPage((prev) => prev - 1)}
@@ -187,6 +210,13 @@ function App() {
                         onClick={() => setCurrentPage((prev) => prev + 1)}
                     >
                         Next
+                    </button>
+
+                    <button
+                        disabled={currentPage === lastPage}
+                        onClick={() => setCurrentPage(lastPage)}
+                    >
+                        Last
                     </button>
                 </div>
             </div>
