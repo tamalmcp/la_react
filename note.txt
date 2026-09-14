@@ -1,5 +1,6 @@
 # source:
     https://chat.deepseek.com/a/chat/s/de045f09-b36b-445d-9a00-e67936af2647
+    https://claude.ai/chat/407fd4d1-a159-4aa4-98ad-3c1ce23ed466
 
 # add the following to App\Providers\AppServiceProvider.php
     use Illuminate\Support\Facades\Schema;
@@ -184,3 +185,47 @@
                 </div>
         // /=======================================================
 
+# seeder:
+    - php artisan make:seeder CategoryPermissionsSeeder
+    - code
+        // =======================================================
+        <?php
+
+        namespace Database\Seeders;
+
+        use Illuminate\Database\Seeder;
+        use Spatie\Permission\Models\Permission;
+        use Spatie\Permission\Models\Role;
+
+        class CategoryPermissionsSeeder extends Seeder
+        {
+            public function run(): void
+            {
+                // create permissions
+                $permissions = [
+                    'view categories',
+                    'create categories',
+                    'edit categories',
+                    'delete categories',
+                ];
+
+                foreach ($permissions as $permission) {
+                    Permission::firstOrCreate(['name' => $permission]);
+                }
+
+                // assign permissions to roles
+                $adminRole = Role::firstOrCreate(['name' => 'admin']);
+                $adminRole->givePermissionTo($permissions);
+
+                $userRole = Role::firstOrCreate(['name' => 'user']);
+                $userRole->givePermissionTo(['view categories']);
+            }
+        }
+        // /=======================================================
+        - php artisan db:seed --class=CategoryPermissionsSeeder
+        - roures/api.php
+            // =======================================================
+            Route::middleware('permission:view categories|create categories|edit categories|delete categories')->group(function () {
+                .....
+            });
+            // /=======================================================
