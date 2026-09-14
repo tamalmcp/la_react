@@ -23,7 +23,7 @@ use App\Http\Controllers\Api\UserController;
 // });
 
 // Route::apiResource('products', ProductController::class);
-Route::apiResource('categories', CategoryController::class);
+// Route::apiResource('categories', CategoryController::class);
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -56,13 +56,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/users/{id}/role', [UserController::class, 'updateRole'])->middleware('permission:edit users');
     });
 
-    // ===========================
-    // Route::get('/categories', [CategoryController::class, 'index']);
-    // Route::post('/categories', [CategoryController::class, 'store']);
-    // Route::get('/categories/{id}', [CategoryController::class, 'show']);
-    // Route::put('/categories/{id}', [CategoryController::class, 'update']);
-    // Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
-    // /==========================
+    Route::middleware('permission:view categories|create categories|edit categories|delete categories')->group(function () {
+        Route::get('/categories', [CategoryController::class, 'index'])->middleware('permission:view categories');
+        Route::post('/categories', [CategoryController::class, 'store'])->middleware('permission:create categories');
+        Route::get('/categories/{id}', [CategoryController::class, 'show'])->middleware('permission:view categories');
+        Route::put('/categories/{id}', [CategoryController::class, 'update'])->middleware('permission:edit categories');
+        Route::delete('/categories/{id}', [CategoryController::class, 'destroy'])->middleware('permission:delete categories');
+    });
 });
 
 // Route::middleware('auth:sanctum')->group(function () {

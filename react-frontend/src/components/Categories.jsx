@@ -62,6 +62,12 @@ function App() {
         setError('');
         setSuccess('');
 
+        const requiredPermission = editingCategory ? 'edit categories' : 'create categories';
+        if (!hasPermission(requiredPermission)) {
+            setError('You do not have permission to perform this action.');
+            return;
+        }
+
         try {
             if (editingCategory) {
                 await axios.put(`/categories/${editingCategory.id}`, formData);
@@ -74,11 +80,16 @@ function App() {
             fetchCategories();
         } catch (error) {
             console.error('Error creating category:', error);
-            setError('Failed to create category');
+            // setError('Failed to create category');
+            setError(error.response.data.message);
         }
     }
 
     const handleEdit = (category) => {
+        if (!hasPermission('edit categories')) {
+            setError('You do not have permission to edit categories.');
+            return;
+        }
         setEditingCategory(category);
         setFormData({
             name: category.name,
@@ -114,7 +125,7 @@ function App() {
         <div className="user-management">
             <div className="user-header">
                 <h2>Categories</h2>
-                {!showForm && (
+                {!showForm && hasPermission('create categories') && (
                 <button className="btn-add-user" onClick={() =>setShowForm(true)}>Add Category</button>
                 )}
             </div>
@@ -122,9 +133,9 @@ function App() {
             {error && <div className="error-message">{error}</div>}
             {success && <div className="success-message">{success}</div>}
 
-            {showForm && (
+            {showForm && (editingCategory ? hasPermission('edit categories') : hasPermission('create categories')) && (
                 <div className="user-form-container">
-                    <h3>Create Category</h3>
+                    <h3>{editingCategory ? 'Edit Category' : 'Create Category'}</h3>
                     <form onSubmit={handleSubmit}>
                         <div className="form-group">
                             <label>Name *</label>
@@ -139,86 +150,100 @@ function App() {
             )}
 
             <div className="users-table-container">
-                <table className="users-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {loading ? (
-                        <tr>
-                            <td colSpan="3">Loading categories...</td>
-                        </tr>
-                        ) : (
-                            categories.length === 0 ? (
+                {!hasPermission('view categories') ? (
+                    <p className="no-products">You do not have permission to view categories.</p>
+                ) : (
+                    <>
+                        <table className="users-table">
+                            <thead>
                                 <tr>
-                                    <td colSpan="3">No categories found.</td>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    {(hasPermission('edit categories') || hasPermission('delete categories')) && (
+                                        <th>Actions</th>
+                                    )}
                                 </tr>
-                            ) : (
-                                // categories.map((category, index) => (
-                                //     <tr key={category.id}>
-                                //         <td>{index + 1}</td>
-                                //         <td>{category.name}</td>
-                                //         <td className="action-buttons">
-                                //             <button className="btn-edit-user" onClick={() => handleEdit(category)}>Edit</button>
-                                //             <button className="btn-delete-user" onClick={() => handleDelete(category.id)}>Delete</button>
-                                //         </td>
-                                //     </tr>
-                                // ))
-
-                                categories.map((category, index) => {
-                                    const perPage = 10; // must match what your backend paginates by
-                                    const serialNo = (currentPage - 1) * perPage + index + 1;
-
-                                    return (
-                                        <tr key={category.id}>
-                                            <td>{serialNo}</td>
-                                            <td>{category.name}</td>
-                                            <td className="action-buttons">
-                                                <button className="btn-edit-user" onClick={() => handleEdit(category)}>Edit</button>
-                                                <button className="btn-delete-user" onClick={() => handleDelete(category.id)}>Delete</button>
-                                            </td>
+                            </thead>
+                            <tbody>
+                                {loading ? (
+                                <tr>
+                                    <td colSpan="3">Loading categories...</td>
+                                </tr>
+                                ) : (
+                                    categories.length === 0 ? (
+                                        <tr>
+                                            <td colSpan="3">No categories found.</td>
                                         </tr>
-                                    );
-                                })
-                            )
-                        )}
-                    </tbody>
-                </table>
-                <div className="pagination-controls">
-                    <button
-                        disabled={currentPage === 1}
-                        onClick={() => setCurrentPage(1)}
-                    >
-                        First
-                    </button>
+                                    ) : (
+                                        // categories.map((category, index) => (
+                                        //     <tr key={category.id}>
+                                        //         <td>{index + 1}</td>
+                                        //         <td>{category.name}</td>
+                                        //         <td className="action-buttons">
+                                        //             <button className="btn-edit-user" onClick={() => handleEdit(category)}>Edit</button>
+                                        //             <button className="btn-delete-user" onClick={() => handleDelete(category.id)}>Delete</button>
+                                        //         </td>
+                                        //     </tr>
+                                        // ))
 
-                    <button
-                        disabled={currentPage === 1}
-                        onClick={() => setCurrentPage((prev) => prev - 1)}
-                    >
-                        Previous
-                    </button>
+                                        categories.map((category, index) => {
+                                            const perPage = 10; // must match what your backend paginates by
+                                            const serialNo = (currentPage - 1) * perPage + index + 1;
 
-                    <span>Page {currentPage} of {lastPage}</span>
-                    
-                    <button
-                        disabled={currentPage === lastPage}
-                        onClick={() => setCurrentPage((prev) => prev + 1)}
-                    >
-                        Next
-                    </button>
+                                            return (
+                                                <tr key={category.id}>
+                                                    <td>{serialNo}</td>
+                                                    <td>{category.name}</td>
+                                                    {(hasPermission('edit categories') || hasPermission('delete categories')) && (
+                                                        <td className="action-buttons">
+                                                            {hasPermission('edit categories') && (
+                                                                <button className="btn-edit-user" onClick={() => handleEdit(category)}>Edit</button>
+                                                            )}
+                                                            {hasPermission('delete categories') && (
+                                                                <button className="btn-delete-user" onClick={() => handleDelete(category.id)}>Delete</button>
+                                                            )}
+                                                        </td>
+                                                    )}
+                                                </tr>
+                                            );
+                                        })
+                                    )
+                                )}
+                            </tbody>
+                        </table>
+                        <div className="pagination-controls">
+                            <button
+                                disabled={currentPage === 1}
+                                onClick={() => setCurrentPage(1)}
+                            >
+                                First
+                            </button>
 
-                    <button
-                        disabled={currentPage === lastPage}
-                        onClick={() => setCurrentPage(lastPage)}
-                    >
-                        Last
-                    </button>
-                </div>
+                            <button
+                                disabled={currentPage === 1}
+                                onClick={() => setCurrentPage((prev) => prev - 1)}
+                            >
+                                Previous
+                            </button>
+
+                            <span>Page {currentPage} of {lastPage}</span>
+                            
+                            <button
+                                disabled={currentPage === lastPage}
+                                onClick={() => setCurrentPage((prev) => prev + 1)}
+                            >
+                                Next
+                            </button>
+
+                            <button
+                                disabled={currentPage === lastPage}
+                                onClick={() => setCurrentPage(lastPage)}
+                            >
+                                Last
+                            </button>
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     );
