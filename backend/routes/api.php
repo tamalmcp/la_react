@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\RolePermissionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,6 +33,20 @@ Route::middleware('auth:sanctum')->group(function () {
     // Auth Routes
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'user']);
+
+    // Role Management
+    Route::get('/roles', [RolePermissionController::class, 'indexRoles']);
+    Route::post('/roles', [RolePermissionController::class, 'storeRole']);
+    Route::put('/roles/{role}', [RolePermissionController::class, 'updateRole']);
+    Route::delete('/roles/{role}', [RolePermissionController::class, 'destroyRole']);
+
+    // Permission Management
+    Route::get('/permissions', [RolePermissionController::class, 'indexPermissions']);
+    Route::post('/permissions', [RolePermissionController::class, 'storePermission']);
+    Route::delete('/permissions/{permission}', [RolePermissionController::class, 'destroyPermission']);
+
+    // Assign Permissions to Role
+    Route::put('/roles/{role}/permissions', [RolePermissionController::class, 'syncPermissions']);
 
     // Route::apiResource('products', ProductController::class);
     // Product CRUD with granular permission checks

@@ -8,6 +8,7 @@ import Products from './components/Products';
 import UserList from './components/UserList';
 import Navigation from './components/Navigation';
 import Categories from './components/Categories';
+import RolePermissionManager from './components/RolePermissionManager';
 import './App.css'
 // import App from './App - Products';
 
@@ -41,6 +42,14 @@ const AppContent = () => {
           element={
             <PrivateRoute>
               <Categories/>
+            </PrivateRoute>
+          }
+        />
+        <Route 
+          path='/rolePermissionManager' 
+          element={
+            <PrivateRoute>
+              <RolePermissionManager/>
             </PrivateRoute>
           }
         />

@@ -229,3 +229,15 @@
                 .....
             });
             // /=======================================================
+
+# Spatie Role & Permission management
+    - https://chat.deepseek.com/a/chat/s/de045f09-b36b-445d-9a00-e67936af2647
+        - Spatie Role & Permission management
+
+# Change css
+    - Frontend
+        - from terminal
+            - stop it:
+                - Ctrl + C
+            - and restart:
+                - npm run dev
