@@ -31,7 +31,10 @@ class RolePermissionController extends Controller
             'name' => 'required|string|unique:roles,name',
         ]);
 
-        $role = Role::create(['name' => $validated['name']]);
+        $role = Role::create([
+            'name' => $validated['name'],
+            'guard_name' => 'web',
+        ]);
         return response()->json($role, 201);
     }
 
@@ -72,7 +75,10 @@ class RolePermissionController extends Controller
             'name' => 'required|string|unique:permissions,name',
         ]);
 
-        $permission = Permission::create(['name' =>$validated['name']]);
+        $permission = Permission::create([
+            'name' =>$validated['name'],
+            'guard_name' => 'web',
+        ]);
         return response()->json($permission, 201);
     }
 

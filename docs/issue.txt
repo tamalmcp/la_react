@@ -1,0 +1,79 @@
+# Issue:
+	- '/products' or '/categories' shows the following message: 
+		[
+			message	"User does not have the right permissions."
+			exception	"Spatie\\Permission\\Exceptions\\UnauthorizedException"
+			file	"E:\\xampp\\htdocs\\la_react\\backend\\vendor\\spatie\\laravel-permission\\src\\Exceptions\\UnauthorizedException.php"
+			line	36
+		]
+		- solution:
+			remove the following from config/auth.php under ( 'guards' => [] ) if added
+			[
+				'sanctum' => [
+					'driver' => 'sanctum',
+					'provider' => 'users',
+				],
+			]
+
+	- 'Delete role' or 'Delete permission' shows the following message:
+		[
+			message	"Class name must be a valid object or a string"
+			exception	"Error"
+			file	"E:\\xampp\\htdocs\\la_react\\backend\\vendor\\laravel\\framework\\src\\Illuminate\\Database\\Eloquent\\Concerns\\HasRelationships.php"
+			line	750
+		]
+		- solution:
+			- 1. add 'guard_name' = 'web' to storePermission and storeRole function
+			[
+				RolePermissionController.php:
+				==============================
+				// POST /api/permissions
+				public function storePermission(Request $request): JsonResponse
+				{
+					$validated = $request->validate([
+						'name' => 'required|string|unique:permissions,name',
+					]);
+
+					$permission = Permission::create([
+						'name' => $validated['name'],
+						'guard_name' => 'web',
+					]);
+					return response()->json($permission, 201);
+				}
+
+				// POST /api/roles
+				public function storeRole(Request $request): JsonResponse
+				{
+					$validated = $request->validate([
+						'name' => 'required|string|unique:roles,name',
+					]);
+
+					$role = Role::create([
+						'name' => $validated['name'],
+						'guard_name' => 'web',
+					]);
+					return response()->json($role, 201);
+				}
+			]
+
+			- 2. Make sure User doesn't override the guard to sanctum
+				If you added protected $guard_name = 'sanctum'; to app/Models/User.php earlier, remove it (or set it to 'web'). Leave the model's default guard resolution alone — it'll pick web from config('auth.defaults.guard').
+			
+			- 3. Fix your seeders so future seeds stay consistent
+				In RolesAndPermissionsSeeder.php and CategoryPermissionsSeeder.php, specify the guard explicitly:
+				[
+					Permission::create(['name' => $permission, 'guard_name' => 'web']);
+					$adminRole = Role::create(['name' => 'admin', 'guard_name' => 'web']);
+				]
+
+			- 4. Fix the data you already have
+				[
+					UPDATE permissions SET guard_name = 'web';
+					UPDATE roles SET guard_name = 'web';
+				]
+
+			- 5. Clear caches
+				[
+					php artisan config:clear
+					php artisan permission:cache-reset
+				]

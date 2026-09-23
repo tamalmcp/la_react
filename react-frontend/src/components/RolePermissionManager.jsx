@@ -49,15 +49,45 @@ const RolePermissionMAnager = () => {
         }
     };
 
+    const handleCreatePermission = async (e) => {
+        e.preventDefault();
+
+        if (!newPermissionName.trim()) return;
+
+        setError('');
+        setSuccess('');
+
+        try {
+            await axios.post('/permissions', {name: newPermissionName});
+            setSuccess('Permission saved successfully!')
+            setNewPermissionName('')
+            fetchData();
+        } catch (error) {
+            setError(error.response?.data?.message || 'Failed to create permission');
+            console.error('Error creating category:', error);
+        }
+    };
+
     const handleDeleteRole = async (id) => {
         if (!window.confirm('Delete this role?')) return;
         try {
-            await axios.delete(`/roles/${id}`)
+            await axios.delete(`/roles/${id}`);
             if (selectedRole?.id === id) setSelectedRole(null);
             setSuccess('Role deleted successfully!');
             fetchData();
         } catch (error) {
-            setError(error.response?.data?.message || 'Failed to create role');
+            setError(error.response?.data?.message || 'Failed to delete role');
+        }
+    };
+
+    const handleDeletePermission = async (id) => {
+        if (!window.confirm('Delete this permission?')) return;
+        try {
+            await axios.delete(`/permissions/${id}`);
+            setSuccess('Permission deleted successfully!');
+            fetchData();
+        } catch (error) {
+            setError(error.response?.data?.message || 'Failed to delete permission');
         }
     };
 
@@ -105,12 +135,12 @@ const RolePermissionMAnager = () => {
                 {/* Permissions Column */}
                 <div className="column permissions-column">
                     <h3>Permissions</h3>
-                    <form className="create-form">
+                    <form onSubmit={handleCreatePermission} className="create-form">
                         <input 
                         type="text" 
                         placeholder="New permission name..."
-                        value=""
-                        onChange=""
+                        value={newPermissionName}
+                        onChange={(e) => setNewPermissionName(e.target.value)}
                         />
                         <button type="submit" className="btn-save">Add</button>
                     </form>
@@ -118,7 +148,12 @@ const RolePermissionMAnager = () => {
                         {permissions.map(perm => (
                         <li key={perm.id}>
                             <span>{perm.name}</span>
-                            <button className="btn-delete-small">x</button>
+                            <button 
+                                className="btn-delete-small" 
+                                onClick={(e) => { e.stopPropagation(); handleDeletePermission(perm.id); }}
+                            >
+                                x
+                            </button>
                         </li>
                         ))}
                     </ul>
