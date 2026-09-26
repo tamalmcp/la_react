@@ -91,6 +91,37 @@ const RolePermissionMAnager = () => {
         }
     };
 
+    const handleTogglePermission = (permissionName) => {
+        if (!selectedRole) return;
+
+        const currentPerms = selectedRole.permissions.map(p => p.name);
+        let newPerms;
+
+        if (currentPerms.includes(permissionName)) {
+            newPerms = currentPerms.filter(p => p !== permissionName);
+        } else {
+            newPerms = [...currentPerms, permissionName];
+        }
+
+        setSelectedRole({
+            ...selectedRole,
+            permissions: newPerms.map(name => ({ name }))
+        });
+    };
+
+    const handleSavePermissions = async () => {
+        if (!selectedRole) return;
+        try {
+            const permissionNames = selectedRole.permissions.map(p => p.name);
+            await axios.put(`/roles/${selectedRole.id}/permissions`, {
+                permissions: permissionNames
+            });
+            setSuccess('Permissions updated successfully!')
+        } catch (error) {
+            setError(error.response?.data?.message || 'Failed to update permissions');
+        }
+    };
+
     if (loading) return <div className="loading">Loading Role Manager...</div>;
 
     return (
@@ -161,19 +192,26 @@ const RolePermissionMAnager = () => {
 
                 {/* Assignment Matrix */}
                 <div className="column assignment-column">
-                    <h3>Assign Permissions to: Role Name</h3>
-                    <div className="permission-matrix">
-                        <label className="checkbox-label">
-                            <input type="checkbox" /> Perm Name
-                        </label>
-                        <label className="checkbox-label">
-                            <input type="checkbox" /> Perm Name2
-                        </label>
-                        <label className="checkbox-label">
-                            <input type="checkbox" /> Perm Name3
-                        </label>
-                    </div>
-                    <button className="btn-save">Save Permissions</button>
+                    <h3>Assign Permissions to: {selectedRole?.name || 'Select a role'} </h3>
+                    {selectedRole ? (
+                        <>
+                            <div className="permission-matrix">
+                                {permissions.map(perm => (
+                                    <label key={perm.id} className="checkbox-label">
+                                        <input 
+                                            type="checkbox" 
+                                            checked={selectedRole.permissions.some(p => p.name === perm.name)}
+                                            onChange={() => handleTogglePermission(perm.name)}
+                                        /> 
+                                        {perm.name}
+                                    </label>
+                                ))}
+                            </div>
+                            <button className="btn-save" onClick={handleSavePermissions}>Save Permissions</button>
+                        </>
+                    ) : (
+                        <p className='hint'>Select a role from the left to manage its permissions.</p>
+                    )}
                 </div>
             </div>
         </div>
