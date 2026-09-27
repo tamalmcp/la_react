@@ -35,11 +35,13 @@ const Navigation = () => {
                     className={location.pathname === '/categories' ? 'active' : ''}>
                         Category
                     </Link>
-                    <Link 
-                        to="rolePermissionManager" 
-                        className={location.pathname === '/rolePermissionManager' ? 'active' : ''}>
-                        RolePermissionManager
-                    </Link>
+                    {user?.role === 'admin' && (
+                        <Link 
+                            to="rolePermissionManager" 
+                            className={location.pathname === '/rolePermissionManager' ? 'active' : ''}>
+                            RolePermissionManager
+                        </Link>
+                    )}
                 </div>
                 <div className="nav-user">
                     <span>{user.name}</span>

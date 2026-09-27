@@ -21,17 +21,26 @@ class UserController extends Controller
 
     public function index(): JsonResponse
     {
-        $users = User::orderBy('created_at', 'desc')->get();
+        $users = User::with('roles')->orderBy('created_at', 'desc')->get();
+
+        $users->each(function ($user) {
+            $user->role = $user->roles->first()->name ?? null;
+        });
+
+        // $users = User::orderBy('created_at', 'desc')->get();
         return response()->json($users);
     }
 
     public function show($id): JsonResponse
     {
-        $user = User::find($id);
+        // $user = User::find($id);
+        $user = User::with('roles')->find($id);
 
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
         }
+
+        $user->role = $user->roles->first()->name ?? null;
 
         return response()->json($user);
     }

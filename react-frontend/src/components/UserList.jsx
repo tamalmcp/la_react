@@ -8,12 +8,13 @@ const UserList = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
+    const [roles, setRoles] = useState([]);
     const [editingUser, setEditingUser] = useState(null);
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         password: '',
-        role: 'user'
+        role: ''
     });
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
@@ -22,6 +23,7 @@ const UserList = () => {
         try {
             const response = await axios.get('/users');
             setUsers(response.data);
+            console.log(response.data);
         } catch (error) {
             console.error('Error fetching users:', error);
             setError('Failed to load users');
@@ -30,8 +32,18 @@ const UserList = () => {
         }
     }
 
+    const fetchRoles = async () => {
+        try {
+            const response = await axios.get('/roles');
+            setRoles(response.data);
+        } catch (error) {
+            console.error('Error fetching roles:', error);
+        }
+    }
+
     useEffect(() => {
         fetchUsers();
+        fetchRoles();
     }, []);
 
     const handleInputChange = (e) => {
@@ -75,7 +87,8 @@ const UserList = () => {
             name: user.name,
             email: user.email,
             password: '',
-            role: user.role || 'user'
+            // role: user.role || 'user',
+            role: user.role ? String(user.role).trim() : '',
         });
         setShowForm(true);
         setError('');
@@ -184,8 +197,17 @@ const UserList = () => {
                                 onChange={handleInputChange}
                                 required
                             >
-                                <option value="user">User</option>
-                                <option value="admin">Admin</option>
+                                <option value="" disabled>Select a role</option>
+                                {roles.map(role => (
+                                    <option key={role.id} value={role.name}>{role.name}</option>
+                                ))}
+                                {formData.role && !roles.some(r => r.name === formData.role) && (
+                                    <option value={formData.role}>
+                                        {formData.role} (unknown role)
+                                    </option>
+                                )}
+                                {/* <option value="user">User</option>
+                                <option value="admin">Admin</option> */}
                             </select>
                         </div>
                         
@@ -240,8 +262,11 @@ const UserList = () => {
                                                 value={user.role || 'user'}
                                                 onChange={(e) => handleRoleChange(user.id, e.target.value)}
                                             >
-                                                <option value="user">User</option>
-                                                <option value="admin">Admin</option>
+                                                {roles.map(role => (
+                                                    <option key={role.id} value={role.name}>{role.name}</option>
+                                                ))}
+                                                {/* <option value="user">User</option>
+                                                <option value="admin">Admin</option> */}
                                             </select>
                                         )}
                                     </td>
@@ -279,6 +304,14 @@ const UserList = () => {
                     <span className="stat-label">Total Users:</span>
                     <span className="stat-value">{users.length}</span>
                 </div>
+                {roles.map(role => (
+                    <div className="stat-item" key={role.id}>
+                        <span className="stat-label">{role.name}s:</span>
+                        <span className="stat-value">
+                            {users.filter(u => u.role === role.name).length}
+                        </span>
+                    </div>
+                ))}
                 <div className="stat-item">
                     <span className="stat-label">Admins:</span>
                     <span className="stat-value">
