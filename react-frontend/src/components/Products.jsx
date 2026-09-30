@@ -12,15 +12,26 @@ function App() {
   const { user, logout, hasPermission } = useAuth();
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     price: '',
-    stock: ''
+    stock: '',
+    category_id: ''
   });
   // const [loading, setLoading] = useState(true);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get('/categories');
+      setCategories(response.data.data ?? response.data);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  }
 
     // Fetch all products
   const fetchProducts = async () => {
@@ -45,6 +56,7 @@ function App() {
   // }
   useEffect(() => {
     fetchProducts();
+    fetchCategories();
   }, []);
 
   // Handle form input changes
@@ -94,7 +106,8 @@ function App() {
       name: product.name,
       description: product.description || '',
       price: product.price,
-      stock: product.stock
+      stock: product.stock,
+      category_id: product.category_id || product.category?.id || ''
     });
     setShowForm(true);
     // console.log('Editing product:', product);
@@ -122,7 +135,8 @@ function App() {
       name: '',
       description: '',
       price: '',
-      stock: ''
+      stock: '',
+      category_id: '',
     });
     setEditingProduct(null);
     setShowForm(false);
@@ -155,6 +169,15 @@ function App() {
           <div className="form-container">
             <h2>{editingProduct ? 'Edit Product' : 'Add New Product'}</h2>
             <form onSubmit={handleSubmit}>
+              <div className="form-group">
+                <label>Category</label>
+                <select name="category_id" value={formData.category_id} onChange={handleInputChange}>
+                    <option value="">Select category</option>
+                    {categories.map(cat => (
+                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                    ))}
+                </select>
+            </div>
               <div className="form-group">
                 <label>Name *</label>
                 <input type="text" name="name" value={formData.name} onChange={handleInputChange} required />

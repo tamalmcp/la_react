@@ -21,7 +21,8 @@ class ProductController extends Controller
      */
     public function index(): JsonResponse
     {
-        $products = Product::orderBy('created_at', 'desc')->get();
+        // $products = Product::orderBy('created_at', 'desc')->get();
+        $products = Product::with('category')->orderBy('created_at', 'desc')->get();
         return response()->json($products);
     }
 
@@ -37,10 +38,12 @@ class ProductController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0'
+            'stock' => 'required|integer|min:0',
+            'category_id' => 'nullable|exists:categories,id'
         ]);
         $product = Product::create($validated);
-        return response()->json($product, 201);
+        // return response()->json($product, 201);
+        return response()->json($product->load('category'), 201);
     }
 
     /**
@@ -51,7 +54,8 @@ class ProductController extends Controller
      */
     public function show($id): JsonResponse
     {
-        $product = Product::find($id);
+        // $product = Product::find($id);
+        $product = Product::with('category')->find($id);
 
         if (!$product) {
             return response()->json(['message' => 'Product not found'], 404);
@@ -79,11 +83,12 @@ class ProductController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0'
+            'stock' => 'required|integer|min:0',
+            'category_id' => 'nullable|exists:categories,id',
         ]);
 
         $product->update($validated);
-        return response()->json($product);
+        return response()->json($product->load('category'));
     }
 
     /**
